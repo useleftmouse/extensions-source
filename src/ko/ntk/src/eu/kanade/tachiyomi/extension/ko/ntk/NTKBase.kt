@@ -63,7 +63,7 @@ abstract class NTKBase(
         if (trimmed.isEmpty()) return PREF_DOMAIN_DEFAULT
 
         if (trimmed.all { it.isDigit() }) {
-            val domainNumber = trimmed.trimStart('0').ifEmpty { "0" }
+            val domainNumber = trimmed.toIntOrNull() ?: return PREF_DOMAIN_DEFAULT
             return "https://sbxh$domainNumber.com"
         }
 
@@ -115,6 +115,7 @@ abstract class NTKBase(
         response
     }
 
+    @Volatile
     private var lastImageRequestTime = 0L
     private val smartRateLimitInterceptor = Interceptor { chain ->
         val request = chain.request()
