@@ -1,0 +1,35 @@
+name: Initialize repo branch
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    name: Create repo branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: true
+
+      - name: Create repo branch if not exists
+        run: |
+          if git ls-remote --exit-code --heads origin repo; then
+            echo "repo branch already exists, nothing to do."
+            exit 0
+          fi
+          git checkout --orphan repo
+          git rm -rf . --quiet
+          echo "[]" > index.min.json
+          echo "[]" > index.json
+          mkdir -p apk icon
+          git add index.min.json index.json apk icon
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git commit -m "Initialize repo branch"
+          git push origin repo
+          echo "repo branch created successfully."
